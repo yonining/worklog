@@ -1724,12 +1724,12 @@ async function load() {
 
 function persist() {
   try { localStorage.setItem('wl_v1', JSON.stringify(logs)); } catch(e) {}
-  DOC.set({ logs, knownTags }, { merge: true }).catch(e => console.warn('Firestore 저장 실패:', e));
+  DOC.set({ logs, knownTags }).catch(e => console.warn('Firestore 저장 실패:', e));
 }
 
 function persistTags() {
   try { localStorage.setItem('wl_tags', JSON.stringify(knownTags)); } catch(e) {}
-  DOC.set({ knownTags }, { merge: true }).catch(e => console.warn('Firestore 저장 실패:', e));
+  DOC.update({ knownTags }).catch(e => console.warn('Firestore 저장 실패:', e));
 }
 
 // ─── Date helpers ─────────────────────────────────────────────────────────────

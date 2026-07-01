@@ -1474,6 +1474,8 @@
       .tab-bar { padding: 0 14px; }
     }
   </style>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
@@ -1657,6 +1659,19 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// ─── Firebase ─────────────────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyBMH4YOXAnS9IJbCer5DVUw9Ers2OuHmzI",
+  authDomain: "worklog-61d3e.firebaseapp.com",
+  projectId: "worklog-61d3e",
+  storageBucket: "worklog-61d3e.firebasestorage.app",
+  messagingSenderId: "876537882032",
+  appId: "1:876537882032:web:6c6574be4cd6f8b228a275"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const DOC = db.collection('worklog').doc('data');
+
 // ─── State ────────────────────────────────────────────────────────────────────
 let curDate = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })();
 let curTab  = 'input';
@@ -1666,10 +1681,7 @@ let logs    = {};  // { 'YYYY-MM-DD': logObj }
 let knownTags = {}; // { name: { name, color } } — all tags ever used
 
 // ─── Storage ──────────────────────────────────────────────────────────────────
-function load() {
-  try { const s = localStorage.getItem('wl_v1'); if (s) logs = JSON.parse(s); } catch(e) {}
-  try { const s = localStorage.getItem('wl_tags'); if (s) knownTags = JSON.parse(s); } catch(e) {}
-  // backfill knownTags from existing logs
+function backfillKnownTags() {
   Object.values(logs).forEach(log => {
     (log.tags || []).forEach(t => {
       const n = tagName(t);
@@ -1678,13 +1690,46 @@ function load() {
   });
 }
 
+async function load() {
+  // 로컬 캐시 먼저 (빠른 초기 렌더링)
+  try { const s = localStorage.getItem('wl_v1'); if (s) logs = JSON.parse(s); } catch(e) {}
+  try { const s = localStorage.getItem('wl_tags'); if (s) knownTags = JSON.parse(s); } catch(e) {}
+  backfillKnownTags();
+
+  // Firestore에서 최신 데이터 불러오기
+  try {
+    const doc = await DOC.get();
+    if (doc.exists) {
+      const data = doc.data();
+      if (data.logs) logs = data.logs;
+      if (data.knownTags) knownTags = data.knownTags;
+      localStorage.setItem('wl_v1', JSON.stringify(logs));
+      localStorage.setItem('wl_tags', JSON.stringify(knownTags));
+      backfillKnownTags();
+      refreshDateUI();
+      loadEntry();
+      drawHistory();
+    }
+  } catch(e) { console.warn('Firestore 불러오기 실패, 로컬 사용:', e); }
+
+  // 다른 기기에서 저장 시 실시간 반영
+  DOC.onSnapshot(snap => {
+    if (!snap.exists) return;
+    const data = snap.data();
+    if (data.logs) { logs = data.logs; localStorage.setItem('wl_v1', JSON.stringify(logs)); }
+    if (data.knownTags) { knownTags = data.knownTags; localStorage.setItem('wl_tags', JSON.stringify(knownTags)); }
+    refreshDateUI(); loadEntry(); drawHistory();
+  }, e => console.warn('Firestore 실시간 오류:', e));
+}
+
 function persist() {
-  try { localStorage.setItem('wl_v1', JSON.stringify(logs)); }
-  catch(e) { toast('저장 실패: 공간 부족'); }
+  try { localStorage.setItem('wl_v1', JSON.stringify(logs)); } catch(e) {}
+  DOC.set({ logs, knownTags }, { merge: true }).catch(e => console.warn('Firestore 저장 실패:', e));
 }
 
 function persistTags() {
   try { localStorage.setItem('wl_tags', JSON.stringify(knownTags)); } catch(e) {}
+  DOC.set({ knownTags }, { merge: true }).catch(e => console.warn('Firestore 저장 실패:', e));
 }
 
 // ─── Date helpers ─────────────────────────────────────────────────────────────
@@ -2753,10 +2798,12 @@ function seedWorklog() {
 }
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
-load();
-seedWorklog();
-refreshDateUI();
-loadEntry();
+(async () => {
+  seedWorklog();
+  refreshDateUI();
+  loadEntry();
+  await load();
+})();
 
 // 5초마다 자동 저장
 setInterval(() => {

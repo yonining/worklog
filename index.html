@@ -1712,13 +1712,13 @@ async function load() {
     }
   } catch(e) { console.warn('Firestore 불러오기 실패, 로컬 사용:', e); }
 
-  // 다른 기기에서 저장 시 실시간 반영
+  // 다른 기기에서 저장 시 실시간 반영 (입력 중인 UI는 건드리지 않음)
   DOC.onSnapshot(snap => {
     if (!snap.exists) return;
     const data = snap.data();
     if (data.logs) { logs = data.logs; localStorage.setItem('wl_v1', JSON.stringify(logs)); }
     if (data.knownTags) { knownTags = data.knownTags; localStorage.setItem('wl_tags', JSON.stringify(knownTags)); }
-    refreshDateUI(); loadEntry(); drawHistory();
+    drawHistory();
   }, e => console.warn('Firestore 실시간 오류:', e));
 }
 

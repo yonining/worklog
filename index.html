@@ -2401,7 +2401,7 @@ function drawHistory() {
       <div class="h-meta">
         ${(() => { const c=e.memo?.comm?.trim(),d=e.memo?.dec?.trim(),n=e.memo?.next?.trim();
           if (!c&&!d&&!n) return '<div class="h-stat" style="opacity:.3">☁️</div><div class="h-stat" style="opacity:.3">🐶</div><div class="h-stat" style="opacity:.3">🌿</div>';
-          return (c?`<div class="h-stat h-diary-text">${x(c)}</div>`:'')+(d?`<div class="h-stat h-diary-text">${x(d)}</div>`:'')+(n?`<div class="h-stat">${x(n)}</div>`:'');
+          return (c?`<div class="h-stat h-diary-text">${x(c)}</div>`:'')+(d?`<div class="h-stat h-diary-text">${x(d)}</div>`:'')+(n?`<div class="h-stat h-diary-text">${x(n)}</div>`:'');
         })()}
         <div style="flex:1"></div>
         <button class="h-del-btn" id="del-${e.date}" onclick="event.stopPropagation();confirmDelete(this,'${e.date}')" title="삭제">

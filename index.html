@@ -439,7 +439,7 @@
     /* ── Table layout ── */
     .cl-table-head {
       display: grid;
-      grid-template-columns: 1fr 78px 78px 28px;
+      grid-template-columns: 1fr 90px 90px 28px;
       border-bottom: 1px solid var(--border);
     }
     .cl-th {
@@ -453,7 +453,7 @@
 
     .cl-item {
       display: grid;
-      grid-template-columns: 1fr 78px 78px 28px;
+      grid-template-columns: 1fr 90px 90px 28px;
       align-items: stretch;
       border-bottom: 1px solid var(--border);
       transition: background .1s;
@@ -489,7 +489,7 @@
       cursor: pointer;
       white-space: nowrap;
       line-height: 1.5;
-      max-width: 66px;
+      max-width: 78px;
       overflow: hidden;
       text-overflow: ellipsis;
     }
@@ -550,9 +550,21 @@
       line-height: 1.4;
       text-align: left;
       width: fit-content;
+      white-space: nowrap;
       transition: filter .12s;
     }
     .tag-pop-chip:hover { filter: brightness(.93); }
+    .tag-del-btn {
+      background: none;
+      border: none;
+      color: var(--text-3);
+      font-size: 14px;
+      line-height: 1;
+      padding: 2px 4px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .tag-del-btn:hover { color: #C92A2A; }
 
     .cl-text {
       flex: 1;
@@ -594,7 +606,7 @@
 
     .cl-add-row {
       display: grid;
-      grid-template-columns: 1fr 78px 78px 28px;
+      grid-template-columns: 1fr 90px 90px 28px;
       align-items: center;
       border-top: 1px solid var(--border);
     }
@@ -789,53 +801,6 @@
     .h-del-btn.confirming { color: #C92A2A; background: #FFF5F5; border: 1px solid #FFC9C9; padding: 3px 8px; }
 
     /* ── History ─────────────────────────────── */
-    .filter-block {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      margin-bottom: 14px;
-    }
-
-    .filter-toggle {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 14px;
-      cursor: pointer;
-      user-select: none;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-2);
-      gap: 6px;
-    }
-
-    .filter-toggle:hover { background: var(--bg); }
-
-    .filter-toggle-icon {
-      font-size: 11px;
-      color: var(--text-3);
-      transition: transform .2s;
-    }
-
-    .filter-toggle-icon.open { transform: rotate(180deg); }
-
-    .filter-active-tags {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-      flex: 1;
-      min-width: 0;
-    }
-
-    .filter-active-tag {
-      background: var(--accent-dim);
-      color: var(--accent);
-      border-radius: 4px;
-      padding: 1px 6px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-
     .filter-tag-chips {
       display: none;
       position: absolute;
@@ -865,20 +830,6 @@
     }
     .filter-tag-chip:hover { opacity: .8; }
     .filter-tag-chip.selected { border-color: var(--text-1); }
-
-    .filter-body {
-      display: none;
-      flex-direction: column;
-      gap: 8px;
-      padding: 0 12px 12px;
-    }
-
-    .filter-body.open { display: flex; }
-
-    .filter-row {
-      display: flex;
-      gap: 8px;
-    }
 
     .filter-field {
       flex: 1;
@@ -1310,8 +1261,7 @@
     @media (max-width: 480px) {
       .panel { padding: 14px; }
       .save-bar { padding: 12px 14px; padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
-      .filter-row { flex-direction: column; }
-      .header-top { padding: 0 14px; }
+.header-top { padding: 0 14px; }
       .tab-bar { padding: 0 14px; }
     }
   </style>
@@ -1503,7 +1453,6 @@ const DOC = db.collection('worklog').doc('data');
 // ─── State ────────────────────────────────────────────────────────────────────
 let curDate = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })();
 let curTab  = 'input';
-let curMemo = 'c';
 let tags    = [];
 let logs    = {};  // { 'YYYY-MM-DD': logObj }
 let knownTags = {}; // { name: { name, color } } — all tags ever used
@@ -1518,14 +1467,20 @@ const DEFAULT_TAGS = [
 ];
 
 function backfillKnownTags() {
-  DEFAULT_TAGS.forEach(t => {
-    if (!knownTags[t.name]) knownTags[t.name] = { name: t.name, color: t.color, kind: t.kind };
+  DEFAULT_TAGS.forEach((t, i) => {
+    if (!knownTags[t.name]) knownTags[t.name] = { name: t.name, color: t.color, kind: t.kind, createdAt: i + 1 };
+    else if (!knownTags[t.name].createdAt) knownTags[t.name].createdAt = i + 1;
   });
   Object.values(logs).forEach(log => {
     (log.tags || []).forEach(t => {
       const n = tagName(t);
       if (n && !knownTags[n]) knownTags[n] = { name: n, color: t.color ?? 0 };
     });
+  });
+  // createdAt 없는 태그들에 순서 부여 (DEFAULT_TAGS 이후)
+  const base = DEFAULT_TAGS.length + 1;
+  Object.values(knownTags).filter(t => !t.createdAt).forEach((t, i) => {
+    t.createdAt = base + i;
   });
 }
 
@@ -1545,6 +1500,7 @@ async function load() {
       localStorage.setItem('wl_v1', JSON.stringify(logs));
       localStorage.setItem('wl_tags', JSON.stringify(knownTags));
       backfillKnownTags();
+      persistTags();
       refreshDateUI();
       loadEntry();
       drawHistory();
@@ -1810,16 +1766,14 @@ const TAG_PALETTE = [
 let itemTagTarget = null;
 
 function getAllUsedTags() {
-  return Object.values(knownTags).sort((a, b) => (b.lastUsed ?? 0) - (a.lastUsed ?? 0));
+  return Object.values(knownTags).sort((a, b) => (a.createdAt ?? Infinity) - (b.createdAt ?? Infinity));
 }
 
 function updateSuggest() {
   const el = document.getElementById('tag-in');
   const query = el.value.trim().toLowerCase();
   const all = getAllUsedTags();
-  const curTags = itemTagTarget ? [] : tags;
   const filtered = all.filter(t =>
-    !curTags.some(cur => cur.name === t.name) &&
     (query === '' || t.name.toLowerCase().includes(query)) &&
     (!itemTagTarget || !t.kind || t.kind === itemTagTarget.kind)
   );
@@ -1827,15 +1781,18 @@ function updateSuggest() {
   const chipsEl = document.getElementById('tag-pop-chips');
   chipsEl.innerHTML = filtered.map(t => {
     const c = palette(t);
-    return `<button class="tag-pop-chip" style="background:${c.bg};color:${c.text}"
-      onmousedown="event.preventDefault();pickSuggest('${x(t.name)}',${t.color ?? 0})">${x(t.name)}</button>`;
+    return `<div style="display:flex;align-items:center;gap:4px">
+      <button class="tag-pop-chip" style="background:${c.bg};color:${c.text};flex:1"
+        onmousedown="event.preventDefault();pickSuggest('${x(t.name)}',${t.color ?? 0})">${x(t.name)}</button>
+      <button class="tag-del-btn" onmousedown="event.preventDefault();deleteKnownTag('${x(t.name)}')" title="삭제">×</button>
+    </div>`;
   }).join('');
 }
 
 function pickSuggest(name, color) {
   if (!itemTagTarget) return;
   const kind = itemTagTarget.kind;
-  knownTags[name] = { ...knownTags[name], lastUsed: Date.now(), kind };
+  knownTags[name] = { ...knownTags[name], kind };
   persistTags();
   const item = items[itemTagTarget.sec][itemTagTarget.i];
   item[tagField(kind)] = { name, color };
@@ -1870,21 +1827,22 @@ function addTag() {
   if (!v) return;
   const color = knownTags[v] ? knownTags[v].color : 0;
   const kind = itemTagTarget.kind;
-  knownTags[v] = { name: v, color, lastUsed: Date.now(), kind };
+  knownTags[v] = { name: v, color, kind, createdAt: Date.now() };
   persistTags();
   const item = items[itemTagTarget.sec][itemTagTarget.i];
   item[tagField(kind)] = { name: v, color };
   persist();
   drawList(itemTagTarget.sec);
   el.value = '';
-  closeSuggest();
+  el.focus();
+  updateSuggest();
 }
 
 function openItemTag(sec, i, kind, btn) {
   itemTagTarget = { sec, i, kind };
   const wrap = document.getElementById('item-tag-wrap');
   const cellRect = (btn.closest('.cl-td-tag') || btn).getBoundingClientRect();
-  const wrapW = Math.max(cellRect.width, 80);
+  const wrapW = Math.max(cellRect.width, 120);
   const left = Math.min(cellRect.left, window.innerWidth - wrapW - 8);
   wrap.style.width = wrapW + 'px';
   wrap.style.top  = (cellRect.bottom + 2) + 'px';
@@ -1971,7 +1929,6 @@ document.addEventListener('click', e => {
 
 // ─── Memo tabs ────────────────────────────────────────────────────────────────
 function goMemo(k) {
-  curMemo = k;
   ['c','d','n'].forEach(t => {
     document.getElementById(`mt-${t}`).classList.toggle('on', t === k);
     document.getElementById(`mp-${t}`).style.display = t === k ? '' : 'none';
@@ -1990,14 +1947,6 @@ function goTab(t) {
   document.getElementById('tb-perf').classList.toggle('on', t === 'perf');
   if (t === 'history') { historyShowAll = false; drawHistory(); }
   if (t === 'perf') drawPerfReport();
-}
-
-function goToDate(dateStr) {
-  const [y, m, d] = dateStr.split('-').map(Number);
-  curDate = new Date(y, m - 1, d);
-  goTab('input');
-  refreshDateUI();
-  loadEntry();
 }
 
 // ─── Save ─────────────────────────────────────────────────────────────────────
@@ -2046,11 +1995,9 @@ let _delTimer = null;
 
 function confirmDelete(btn, dateStr) {
   if (btn.classList.contains('confirming')) {
-    // 두 번째 클릭 → 실제 삭제
     clearTimeout(_delTimer);
     deleteLog(dateStr);
   } else {
-    // 첫 번째 클릭 → 확인 대기 상태
     btn.classList.add('confirming');
     btn.innerHTML = '삭제 확인';
     _delTimer = setTimeout(() => {
@@ -2071,14 +2018,6 @@ function deleteLog(dateStr) {
 // ─── History ──────────────────────────────────────────────────────────────────
 let historyShowAll = false;
 
-function toggleFilter() {
-  const body = document.getElementById('filter-body');
-  const icon = document.getElementById('filter-icon');
-  const open = body.classList.toggle('open');
-  icon.classList.toggle('open', open);
-  if (open) { renderFilterTagChips(); document.getElementById('f-tag').focus(); }
-}
-
 function renderFilterTagChips() {
   const container = document.getElementById('filter-tag-chips');
   const current = document.getElementById('f-tag').value.trim().toLowerCase();
@@ -2098,16 +2037,7 @@ function pickFilterTag(name) {
   const inp = document.getElementById('f-tag');
   inp.value = inp.value.trim().toLowerCase() === name.toLowerCase() ? '' : name;
   drawHistory();
-  updateFilterBadge();
   renderFilterTagChips();
-}
-
-function updateFilterBadge() {
-  const fTag = document.getElementById('f-tag').value.trim();
-  const badge = document.getElementById('filter-active-tags');
-  badge.innerHTML = fTag
-    ? `<span class="filter-active-tag">${x(fTag)}</span>`
-    : '';
 }
 
 function drawHistory() {

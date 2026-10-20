@@ -21,12 +21,8 @@
       --accent:     #3B5BDB;
       --accent-h:   #2F4AC5;
       --accent-dim: #EDF2FF;
-      --y-c:        #7048E8;
-      --y-dim:      #F4F0FF;
       --t-c:        #1864AB;
       --t-dim:      #E7F5FF;
-      --g-c:        #2B8A3E;
-      --g-dim:      #EBFBEE;
       --r:          10px;
       --r-sm:       6px;
     }
@@ -82,8 +78,6 @@
       font-style: normal;
       color: var(--accent);
     }
-
-    .wordmark-sub { display: none; }
 
     .data-btn {
       background: none;
@@ -394,22 +388,6 @@
       overflow: hidden;
     }
 
-    .card-head {
-      padding: 11px 16px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .card-label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      color: var(--text-3);
-    }
-
     .card-body { padding: 12px 16px; }
 
     textarea {
@@ -458,84 +436,132 @@
 
     .cl-list { background: var(--surface); }
 
+    /* ── Table layout ── */
+    .cl-table-head {
+      display: grid;
+      grid-template-columns: 1fr 78px 78px 28px;
+      border-bottom: 1px solid var(--border);
+    }
+    .cl-th {
+      font-size: 11px;
+      color: var(--text-3);
+      font-weight: 600;
+      padding: 7px 10px;
+      letter-spacing: .3px;
+    }
+    .cl-th + .cl-th { border-left: 1px solid var(--border); text-align: center; }
+
     .cl-item {
+      display: grid;
+      grid-template-columns: 1fr 78px 78px 28px;
+      align-items: stretch;
+      border-bottom: 1px solid var(--border);
+      transition: background .1s;
+      min-height: 38px;
+    }
+    .cl-item:last-child { border-bottom: none; }
+    .cl-item:hover { background: rgba(0,0,0,.018); }
+    .cl-item:hover .cl-del { opacity: 1; }
+
+    .cl-td {
+      padding: 8px 10px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 8px 14px;
-      border-top: 1px solid var(--border);
-      transition: background .1s;
+    }
+    .cl-td-tag {
+      border-left: 1px solid var(--border);
+      padding: 6px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cl-td-del {
+      border-left: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .cl-item.sub {
-      padding-left: 38px;
-      background: #FAFBFF;
-    }
-
-    .cl-item.sub2 {
-      padding-left: 64px;
-      background: #F8F9FF;
-    }
-
-    .cl-item.sub2 .cl-check {
-      width: 12px; height: 12px;
-      border-radius: 50%;
-      opacity: .5;
-    }
-
-    .cl-item.sub2 .cl-text { font-size: 12px; color: var(--text-3); }
-    .cl-item.sub2 .cl-check:checked::after { left: 1px; top: 0px; width: 5px; height: 3px; }
-
-    .cl-item:hover .cl-del { opacity: 1; }
-    .cl-item:hover .cl-sub-btn { opacity: 1; }
-
-    .cl-check {
-      appearance: none;
-      -webkit-appearance: none;
-      flex-shrink: 0;
+    .cl-itag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 20px;
       cursor: pointer;
-      position: relative;
-      transition: background .12s;
-      border: 2px solid;
-      border-radius: 5px;
-      width: 17px;
-      height: 17px;
+      white-space: nowrap;
+      line-height: 1.5;
+      max-width: 66px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .cl-item.sub .cl-check {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
+    .cl-tag-slot {
+      font-size: 11px;
+      border: none;
+      border-radius: 4px;
+      padding: 2px 4px;
+      color: var(--text-3);
+      background: none;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity .15s;
+      white-space: nowrap;
     }
+    .cl-item:hover .cl-tag-slot { opacity: .55; }
+    .cl-tag-slot:hover { opacity: 1 !important; color: var(--accent); }
 
-    .cl-block.t .cl-check { border-color: var(--t-c); color: var(--t-c); }
-
-    .cl-item.sub .cl-check { opacity: .65; }
-
-    .cl-check:checked { background: currentColor; }
-
-    .cl-check:checked::after {
-      content: '';
-      position: absolute;
-      left: 2px; top: 1px;
-      width: 7px; height: 4px;
-      border-left: 2px solid #fff;
-      border-bottom: 2px solid #fff;
-      transform: rotate(-45deg);
+    .item-tag-input-wrap {
+      position: fixed;
+      z-index: 310;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 8px 28px rgba(0,0,0,.12);
     }
-
-    .cl-item.sub .cl-check:checked::after {
-      left: 1px; top: 0px;
-      width: 6px; height: 3px;
+    .item-tag-input-wrap.on { display: flex; }
+    .item-tag-input {
+      border: none;
+      outline: none;
+      background: var(--bg);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text-1);
+      width: 100%;
     }
+    .item-tag-input::placeholder { color: var(--text-3); }
+    .tag-pop-chips {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-height: 4px;
+    }
+    .tag-pop-chip {
+      font-size: 13px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      line-height: 1.4;
+      text-align: left;
+      width: fit-content;
+      transition: filter .12s;
+    }
+    .tag-pop-chip:hover { filter: brightness(.93); }
 
     .cl-text {
       flex: 1;
       font-size: 14px;
-      line-height: 1.5;
+      line-height: 1.45;
       color: var(--text-1);
-      transition: color .12s;
       cursor: text;
+      min-width: 0;
+      word-break: break-word;
     }
 
     .cl-edit-input {
@@ -548,133 +574,46 @@
       border-bottom: 1.5px solid var(--accent);
       outline: none;
       padding: 0;
-      line-height: 1.5;
+      line-height: 1.45;
+      min-width: 0;
+      width: 100%;
     }
-
-    .cl-item.sub .cl-text { font-size: 13px; color: var(--text-2); }
-
-    .cl-check:checked + .cl-text {
-      text-decoration: line-through;
-      color: var(--text-3);
-    }
-
-    .cl-sub-btn {
-      background: none;
-      border: none;
-      color: var(--text-3);
-      font-size: 13px;
-      line-height: 1;
-      padding: 2px 4px;
-      opacity: 0;
-      transition: opacity .12s, color .12s, background .12s;
-      flex-shrink: 0;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    .cl-sub-btn:hover { color: var(--accent); background: var(--accent-dim); opacity: 1; }
 
     .cl-del {
       background: none;
       border: none;
       color: var(--text-3);
-      font-size: 16px;
+      font-size: 15px;
       line-height: 1;
-      padding: 0 2px;
+      padding: 0 4px;
       opacity: 0;
-      transition: opacity .12s, color .12s;
-      flex-shrink: 0;
+      transition: opacity .15s;
+      cursor: pointer;
     }
-
     .cl-del:hover { color: #C92A2A; opacity: 1; }
 
-    .cl-inline-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 14px 6px 38px;
-      border-top: 1px solid var(--border);
-      background: #FAFBFF;
-    }
-
-    .cl-inline-input {
-      flex: 1;
-      border: none;
-      outline: none;
-      font-size: 13px;
-      font-family: inherit;
-      color: var(--text-1);
-      background: transparent;
-      padding: 1px 0;
-    }
-
-    .cl-inline-input::placeholder { color: var(--text-3); }
-
     .cl-add-row {
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr 78px 78px 28px;
       align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
       border-top: 1px solid var(--border);
-      transition: padding-left .12s;
     }
-
-    .cl-add-row.sub  { padding-left: 38px; background: #FAFBFF; }
-    .cl-add-row.sub2 { padding-left: 64px; background: #F8F9FF; }
-
-    .cl-add-icon {
-      width: 17px;
-      height: 17px;
-      border-radius: 5px;
-      border: 2px dashed var(--text-3);
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      color: var(--text-3);
-      line-height: 1;
-      transition: border-radius .12s;
-    }
-
-    .cl-add-row.sub .cl-add-icon { border-radius: 50%; width: 14px; height: 14px; font-size: 11px; }
 
     .cl-input {
-      flex: 1;
       border: none;
       outline: none;
       font-size: 14px;
       font-family: inherit;
       color: var(--text-1);
       background: transparent;
-      padding: 1px 0;
+      padding: 9px 10px;
+      width: 100%;
     }
-
-    .cl-add-row.sub .cl-input { font-size: 13px; }
 
     .cl-input::placeholder { color: var(--text-3); }
 
-    .cl-tab-hint {
-      font-size: 10px;
-      color: var(--text-3);
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity .15s;
-      pointer-events: none;
-      letter-spacing: 0.2px;
-    }
-
-    .cl-input:focus ~ .cl-tab-hint { opacity: 1; }
 
     /* ── Tags ────────────────────────────────── */
-    .tag-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 10px;
-      min-height: 4px;
-    }
-
     .chip {
       display: inline-flex;
       align-items: center;
@@ -688,100 +627,6 @@
     }
 
     .chip:hover { filter: brightness(.94); }
-
-    .chip-x {
-      background: none;
-      border: none;
-      opacity: .5;
-      font-size: 15px;
-      line-height: 1;
-      padding: 0 1px;
-      cursor: pointer;
-      transition: opacity .12s;
-    }
-
-    .chip-x:hover { opacity: 1; }
-
-    .tag-row {
-      display: flex;
-      gap: 8px;
-      position: relative;
-    }
-
-    .tag-field {
-      flex: 1;
-      border: 1px solid var(--border);
-      border-radius: var(--r-sm);
-      padding: 8px 12px;
-      font-size: 13px;
-      font-family: inherit;
-      outline: none;
-      color: var(--text-1);
-      background: var(--bg);
-      transition: border-color .15s;
-    }
-
-    .tag-field:focus {
-      border-color: var(--accent);
-      background: var(--surface);
-    }
-
-    .tag-suggest {
-      position: fixed;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      box-shadow: 0 6px 20px rgba(0,0,0,.12);
-      z-index: 300;
-      overflow-y: auto;
-      max-height: calc(7 * 38px);
-      display: none;
-      min-width: 180px;
-    }
-
-    .tag-suggest.on { display: block; }
-
-    .suggest-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      cursor: pointer;
-      transition: background .1s;
-      font-size: 13px;
-    }
-
-    .suggest-item:hover, .suggest-item.focused { background: var(--bg); }
-    .suggest-item { justify-content: space-between; }
-    .suggest-del {
-      font-size: 14px;
-      color: var(--text-3);
-      padding: 2px 4px;
-      border-radius: 4px;
-      opacity: 0;
-      transition: opacity .1s;
-    }
-    .suggest-item:hover .suggest-del { opacity: 1; }
-
-    .suggest-empty {
-      padding: 10px 12px;
-      font-size: 13px;
-      color: var(--text-3);
-    }
-
-    .btn-add {
-      padding: 8px 15px;
-      background: var(--accent-dim);
-      color: var(--accent);
-      border: none;
-      border-radius: var(--r-sm);
-      font-size: 13px;
-      font-weight: 600;
-      white-space: nowrap;
-      transition: background .15s, color .15s;
-    }
-
-    .btn-add:hover { background: var(--accent); color: #fff; }
 
     /* ── Tag popover ─────────────────────────── */
     .tag-pop {
@@ -1091,30 +936,25 @@
       margin-left: 4px;
     }
 
-    .h-chips {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .h-chip {
-      font-size: 11px;
-      font-weight: 600;
-      background: var(--g-dim);
-      color: var(--g-c);
-      padding: 2px 8px;
-      border-radius: 20px;
-    }
-
     .h-preview {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .h-preview-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       font-size: 13px;
       color: var(--text-2);
+      line-height: 1.45;
+    }
+    .h-preview-text {
+      flex: 1;
       overflow: hidden;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      line-height: 1.5;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      min-width: 0;
     }
 
     .h-meta {
@@ -1513,39 +1353,29 @@
 
     <!-- Today checklist -->
     <div class="cl-block t">
-      <div class="cl-head">
-        <div class="cl-dot"></div>
-        오늘 업무
+      <div class="cl-table-head">
+        <div class="cl-th">업무</div>
+        <div class="cl-th">프로젝트</div>
+        <div class="cl-th">유형</div>
+        <div class="cl-th"></div>
       </div>
       <div class="cl-list" id="list-t"></div>
       <div class="cl-add-row" id="add-row-t">
-        <div class="cl-add-icon">+</div>
         <input class="cl-input" id="in-t" placeholder="항목 추가 후 Enter" onkeydown="onItemKey(event,'t')">
-        <span class="cl-tab-hint" id="hint-t">Tab ↓</span>
+        <div></div><div></div><div></div>
       </div>
     </div>
 
-    <!-- Tags -->
-    <div class="card">
-      <div class="card-head">
-        <div class="card-label">프로젝트 태그</div>
-      </div>
-      <div class="card-body">
-        <div class="tag-list" id="tag-list"></div>
-        <div class="tag-row">
-          <input class="tag-field" id="tag-in" placeholder="태그 입력 후 Enter"
-            onkeydown="onTagKey(event)" oninput="updateSuggest()" onfocus="updateSuggest()" autocomplete="off">
-          <button class="btn-add" onclick="addTag()">추가</button>
-        </div>
-      </div>
+    <!-- item-level tag popover -->
+    <div class="item-tag-input-wrap" id="item-tag-wrap">
+      <input class="item-tag-input" id="tag-in" placeholder=""
+        onkeydown="onTagKey(event)" oninput="updateSuggest()" autocomplete="off">
+      <div class="tag-pop-chips" id="tag-pop-chips"></div>
     </div>
 
     <!-- Memo -->
     <div class="card">
-      <div class="card-head">
-        <div class="card-label">메모</div>
-      </div>
-      <div class="card-body">
+      <div class="card-body" style="padding-top:16px">
         <div class="memo-tabs">
           <button class="memo-tab on" id="mt-c" onclick="goMemo('c')">커뮤니케이션</button>
           <button class="memo-tab"    id="mt-n" onclick="goMemo('n')">배운점</button>
@@ -1654,9 +1484,6 @@
   <div class="cal-grid" id="cal-grid"></div>
 </div>
 
-<!-- Tag suggest dropdown -->
-<div class="tag-suggest" id="tag-suggest"></div>
-
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1682,7 +1509,18 @@ let logs    = {};  // { 'YYYY-MM-DD': logObj }
 let knownTags = {}; // { name: { name, color } } — all tags ever used
 
 // ─── Storage ──────────────────────────────────────────────────────────────────
+const DEFAULT_TAGS = [
+  { name: '비포',   color: 4, kind: 'project' },
+  { name: '커플',   color: 0, kind: 'project' },
+  { name: '그래픽', color: 2, kind: 'type' },
+  { name: '운영',   color: 1, kind: 'type' },
+  { name: 'QA',     color: 5, kind: 'type' },
+];
+
 function backfillKnownTags() {
+  DEFAULT_TAGS.forEach(t => {
+    if (!knownTags[t.name]) knownTags[t.name] = { name: t.name, color: t.color, kind: t.kind };
+  });
   Object.values(logs).forEach(log => {
     (log.tags || []).forEach(t => {
       const n = tagName(t);
@@ -1720,6 +1558,7 @@ async function load() {
     if (data.logs) { logs = data.logs; localStorage.setItem('wl_v1', JSON.stringify(logs)); }
     if (data.knownTags) { knownTags = data.knownTags; localStorage.setItem('wl_tags', JSON.stringify(knownTags)); }
     drawHistory();
+    if (curTab === 'perf') drawPerfReport();
   }, e => console.warn('Firestore 실시간 오류:', e));
 }
 
@@ -1871,22 +1710,27 @@ function pickCalDay(dk) {
 
 // ─── Checklist ────────────────────────────────────────────────────────────────
 let items = { y: [], t: [] }; // [{ text, done, level }]
-let inputLevel = { y: 0, t: 0 };
+
+function tagSlot(sec, i, item, kind) {
+  const t = item[tagField(kind)];
+  if (t) {
+    const c = palette(t);
+    return `<span class="cl-itag" style="background:${c.bg};color:${c.text}" onclick="event.stopPropagation();openItemTagPop(event,'${sec}',${i},'${kind}')">${x(t.name)}</span>`;
+  }
+  return `<button class="cl-tag-slot" onclick="event.stopPropagation();openItemTag('${sec}',${i},'${kind}',this)">+</button>`;
+}
 
 function drawList(sec) {
   const el = document.getElementById('list-' + sec);
   if (!el) return;
-  el.innerHTML = items[sec].map((item, i) => {
-    const lvCls = item.level === 2 ? ' sub2' : item.level === 1 ? ' sub' : '';
-    const isTop = item.level === 0;
-    return `<div class="cl-item${lvCls}" id="item-${sec}-${i}">
-      <input type="checkbox" class="cl-check" ${item.done ? 'checked' : ''}
-        onchange="toggleItem('${sec}',${i},this.checked)">
-      <span class="cl-text" onclick="editItem('${sec}',${i},this)">${x(item.text)}</span>
-      ${isTop ? `<button class="cl-sub-btn" onclick="openInline('${sec}',${i})" title="하위 항목 추가">+ 하위</button>` : ''}
-      <button class="cl-del" onclick="delItem('${sec}',${i})">×</button>
-    </div>`;
-  }).join('');
+  el.innerHTML = items[sec].map((item, i) =>
+    `<div class="cl-item" id="item-${sec}-${i}">
+      <div class="cl-td"><span class="cl-text" onclick="editItem('${sec}',${i},this)">${x(item.text)}</span></div>
+      <div class="cl-td-tag">${tagSlot(sec, i, item, 'project')}</div>
+      <div class="cl-td-tag">${tagSlot(sec, i, item, 'type')}</div>
+      <div class="cl-td-del"><button class="cl-del" onclick="delItem('${sec}',${i})">×</button></div>
+    </div>`
+  ).join('');
 }
 
 function editItem(sec, i, span) {
@@ -1922,61 +1766,12 @@ function editItem(sec, i, span) {
   inp.addEventListener('blur', () => commit(false));
 }
 
-function openInline(sec, afterIdx) {
-  // 이미 열려있으면 닫기
-  const existing = document.getElementById('inline-input-row');
-  if (existing) existing.remove();
-
-  const row = document.createElement('div');
-  row.className = 'cl-inline-row';
-  row.id = 'inline-input-row';
-
-  const dot = document.createElement('div');
-  dot.style.cssText = 'width:8px;height:8px;border-radius:50%;background:var(--text-3);flex-shrink:0';
-
-  const inp = document.createElement('input');
-  inp.className = 'cl-inline-input';
-  inp.placeholder = '하위 항목 입력 후 Enter';
-
-  inp.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.isComposing) {
-      e.preventDefault();
-      const v = inp.value.trim();
-      if (v) {
-        items[sec].splice(afterIdx + 1, 0, { text: v, done: false, level: 1 });
-      }
-      drawList(sec);
-    }
-    if (e.key === 'Escape') {
-      row.remove();
-    }
-  });
-
-  inp.addEventListener('blur', () => setTimeout(() => row.remove(), 150));
-
-  row.appendChild(dot);
-  row.appendChild(inp);
-
-  const anchor = document.getElementById(`item-${sec}-${afterIdx}`);
-  anchor.insertAdjacentElement('afterend', row);
-  inp.focus();
-}
-
-function updateAddRow(sec) {
-  const lv = inputLevel[sec];
-  const row = document.getElementById('add-row-' + sec);
-  if (!row) return;
-  row.classList.toggle('sub',  lv === 1);
-  row.classList.toggle('sub2', lv === 2);
-  const hint = document.getElementById('hint-' + sec);
-  if (hint) hint.textContent = lv > 0 ? '⇧Tab ↑' : 'Tab ↓';
-}
 
 function addItem(sec) {
   const el = document.getElementById('in-' + sec);
   const v = el.value.trim();
   if (!v) return;
-  items[sec].push({ text: v, done: false, level: inputLevel[sec] });
+  items[sec].push({ text: v, done: false, level: 0 });
   drawList(sec);
   el.value = '';
   el.focus();
@@ -1987,28 +1782,16 @@ function delItem(sec, i) {
   drawList(sec);
 }
 
-function toggleItem(sec, i, done) {
-  items[sec][i].done = done;
-}
-
 function onItemKey(e, sec) {
-  if (e.key === 'Tab') {
-    e.preventDefault();
-    inputLevel[sec] = e.shiftKey ? Math.max(0, inputLevel[sec] - 1) : Math.min(2, inputLevel[sec] + 1);
-    updateAddRow(sec);
-    return;
-  }
-  if (e.key === 'Backspace' && e.currentTarget.value === '' && inputLevel[sec] > 0) {
-    e.preventDefault();
-    inputLevel[sec] = Math.max(0, inputLevel[sec] - 1);
-    updateAddRow(sec);
-    return;
-  }
   if (e.key === 'Enter' && !e.isComposing) {
     e.preventDefault();
     addItem(sec);
   }
 }
+
+// ─── Tag helpers ──────────────────────────────────────────────────────────────
+const tagField = kind => kind === 'project' ? 'projectTag' : 'typeTag';
+const palette  = t => TAG_PALETTE[t?.color ?? 0];
 
 // ─── Tag colors ───────────────────────────────────────────────────────────────
 const TAG_PALETTE = [
@@ -2020,174 +1803,163 @@ const TAG_PALETTE = [
   { name: '청록색', bg: '#E6FCF5', text: '#0C8599' },
   { name: '파란색', bg: '#E7F5FF', text: '#1864AB' },
   { name: '보라색', bg: '#F3F0FF', text: '#6741D9' },
-  { name: '분홍색', bg: '#FFF0F6', text: '#C2255C' },
+  { name: '분홍색', bg: '#FFE4F3', text: '#E0348A' },
 ];
 
 // ─── Tags ─────────────────────────────────────────────────────────────────────
-function drawTags() {
-  document.getElementById('tag-list').innerHTML = tags.map((t, i) => {
-    const c = TAG_PALETTE[t.color ?? 0];
-    return `<div class="chip" style="background:${c.bg};color:${c.text}" onclick="openTagPop(event,${i})">${x(t.name)}<button class="chip-x" style="color:${c.text}" onclick="event.stopPropagation();rmTag(${i})">×</button></div>`;
-  }).join('');
-}
+let itemTagTarget = null;
 
 function getAllUsedTags() {
   return Object.values(knownTags).sort((a, b) => (b.lastUsed ?? 0) - (a.lastUsed ?? 0));
 }
 
-let suggestIdx = -1;
-
 function updateSuggest() {
   const el = document.getElementById('tag-in');
   const query = el.value.trim().toLowerCase();
   const all = getAllUsedTags();
+  const curTags = itemTagTarget ? [] : tags;
   const filtered = all.filter(t =>
-    !tags.some(cur => cur.name === t.name) &&
-    (query === '' || t.name.toLowerCase().includes(query))
+    !curTags.some(cur => cur.name === t.name) &&
+    (query === '' || t.name.toLowerCase().includes(query)) &&
+    (!itemTagTarget || !t.kind || t.kind === itemTagTarget.kind)
   );
-  const box = document.getElementById('tag-suggest');
-  suggestIdx = -1;
-  if (!filtered.length) { box.classList.remove('on'); return; }
-  const rect = el.getBoundingClientRect();
-  box.style.top  = (rect.bottom + 4) + 'px';
-  box.style.left = rect.left + 'px';
-  box.style.width = rect.width + 'px';
-  box.innerHTML = filtered.map((t, i) => {
-    const c = TAG_PALETTE[t.color ?? 0];
-    return `<div class="suggest-item" data-name="${x(t.name)}" data-color="${t.color ?? 0}"
-      onmousedown="pickSuggest('${x(t.name)}',${t.color ?? 0})">
-      <span class="chip" style="background:${c.bg};color:${c.text};padding:2px 9px;font-size:11px">${x(t.name)}</span>
-      <span class="suggest-del" onmousedown="event.stopPropagation();deleteKnownTag('${x(t.name)}')" title="삭제">×</span>
-    </div>`;
+
+  const chipsEl = document.getElementById('tag-pop-chips');
+  chipsEl.innerHTML = filtered.map(t => {
+    const c = palette(t);
+    return `<button class="tag-pop-chip" style="background:${c.bg};color:${c.text}"
+      onmousedown="event.preventDefault();pickSuggest('${x(t.name)}',${t.color ?? 0})">${x(t.name)}</button>`;
   }).join('');
-  box.classList.add('on');
 }
 
 function pickSuggest(name, color) {
-  if (tags.some(t => t.name === name)) return;
-  tags.push({ name, color });
-  knownTags[name] = { ...knownTags[name], lastUsed: Date.now() };
+  if (!itemTagTarget) return;
+  const kind = itemTagTarget.kind;
+  knownTags[name] = { ...knownTags[name], lastUsed: Date.now(), kind };
   persistTags();
-  drawTags();
+  const item = items[itemTagTarget.sec][itemTagTarget.i];
+  item[tagField(kind)] = { name, color };
+  persist();
+  drawList(itemTagTarget.sec);
   const el = document.getElementById('tag-in');
   el.value = '';
-  document.getElementById('tag-suggest').classList.remove('on');
   el.focus();
+  updateSuggest();
 }
 
 function deleteKnownTag(name) {
   delete knownTags[name];
   persistTags();
-  renderTagSuggest(document.getElementById('tag-in'));
+  updateSuggest();
 }
 
 function closeSuggest() {
-  document.getElementById('tag-suggest').classList.remove('on');
-  suggestIdx = -1;
+  document.getElementById('item-tag-wrap').classList.remove('on');
+  document.getElementById('tag-pop-chips').innerHTML = '';
+  itemTagTarget = null;
 }
 
 document.addEventListener('click', e => {
-  if (!e.target.closest('.tag-row')) closeSuggest();
+  if (!e.target.closest('#item-tag-wrap') && !e.target.closest('.cl-tag-btn')) closeSuggest();
 });
 
 function addTag() {
+  if (!itemTagTarget) return;
   const el = document.getElementById('tag-in');
   const v = el.value.trim();
   if (!v) return;
-  if (tags.some(t => t.name === v)) { toast('이미 있는 태그입니다'); return; }
-  // 기존에 쓴 태그면 같은 색상 유지
   const color = knownTags[v] ? knownTags[v].color : 0;
-  tags.push({ name: v, color });
-  knownTags[v] = { name: v, color, lastUsed: Date.now() };
+  const kind = itemTagTarget.kind;
+  knownTags[v] = { name: v, color, lastUsed: Date.now(), kind };
   persistTags();
-  drawTags();
+  const item = items[itemTagTarget.sec][itemTagTarget.i];
+  item[tagField(kind)] = { name: v, color };
+  persist();
+  drawList(itemTagTarget.sec);
   el.value = '';
   closeSuggest();
 }
 
-function rmTag(i) { tags.splice(i,1); closeTagPop(); drawTags(); }
-
-function onTagKey(e) {
-  const box = document.getElementById('tag-suggest');
-  const rows = box.querySelectorAll('.suggest-item');
-  if (e.key === 'ArrowDown') {
-    e.preventDefault();
-    suggestIdx = Math.min(suggestIdx + 1, rows.length - 1);
-    rows.forEach((r, i) => r.classList.toggle('focused', i === suggestIdx));
-    return;
-  }
-  if (e.key === 'ArrowUp') {
-    e.preventDefault();
-    suggestIdx = Math.max(suggestIdx - 1, -1);
-    rows.forEach((r, i) => r.classList.toggle('focused', i === suggestIdx));
-    return;
-  }
-  if (e.key === 'Enter' && !e.isComposing) {
-    e.preventDefault();
-    if (suggestIdx >= 0 && rows[suggestIdx]) {
-      const el = rows[suggestIdx];
-      pickSuggest(el.dataset.name, parseInt(el.dataset.color));
-    } else {
-      addTag();
-    }
-    return;
-  }
-  if (e.key === 'Escape') { closeSuggest(); return; }
+function openItemTag(sec, i, kind, btn) {
+  itemTagTarget = { sec, i, kind };
+  const wrap = document.getElementById('item-tag-wrap');
+  const cellRect = (btn.closest('.cl-td-tag') || btn).getBoundingClientRect();
+  const wrapW = Math.max(cellRect.width, 80);
+  const left = Math.min(cellRect.left, window.innerWidth - wrapW - 8);
+  wrap.style.width = wrapW + 'px';
+  wrap.style.top  = (cellRect.bottom + 2) + 'px';
+  wrap.style.left = left + 'px';
+  wrap.classList.add('on');
+  const el = document.getElementById('tag-in');
+  el.value = '';
+  el.focus();
+  updateSuggest();
 }
 
-// ─── Tag popover ──────────────────────────────────────────────────────────────
-let popIdx = -1;
-
-function openTagPop(e, i) {
+function openItemTagPop(e, sec, i, kind) {
   e.stopPropagation();
-  popIdx = i;
+  const item = items[sec][i];
+  const tag = item[tagField(kind)];
+  if (!tag) return;
+  itemTagTarget = { sec, i, kind };
   const pop = document.getElementById('tag-pop');
-  const tag = tags[i];
-  const rect = e.currentTarget.getBoundingClientRect();
-
   pop.innerHTML = `
     <div class="pop-name">${x(tag.name)}</div>
-    <button class="pop-del" onclick="rmTag(${i})">
+    <button class="pop-del" onclick="rmItemTag('${sec}',${i},'${kind}')">
       <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M6 2h4a1 1 0 0 0-2 0H6a1 1 0 0 0-2 0zm-2 2h8l-.8 9H4.8L4 4zm2 2v5h1V6H6zm3 0v5h1V6H9z"/></svg>
       삭제
     </button>
     <div class="pop-colors-label">색상</div>
     ${TAG_PALETTE.map((c, ci) => `
-      <div class="pop-color-row" onclick="setTagColor(${i},${ci})">
+      <div class="pop-color-row" onclick="setItemTagColor('${sec}',${i},'${kind}',${ci})">
         <div class="pop-swatch" style="background:${c.bg};outline:1px solid ${c.text}33"></div>
         <span class="pop-color-name">${c.name}</span>
         <span class="pop-check">${tag.color === ci ? '✓' : ''}</span>
       </div>
     `).join('')}
   `;
-
-  // position below the chip, stay in viewport
-  const top = rect.bottom + 6;
-  const left = Math.min(rect.left, window.innerWidth - 200);
-  pop.style.top = top + 'px';
-  pop.style.left = left + 'px';
+  const rect = e.currentTarget.getBoundingClientRect();
+  pop.style.top  = (rect.bottom + 6) + 'px';
+  pop.style.left = Math.min(rect.left, window.innerWidth - 200) + 'px';
   pop.classList.add('on');
 }
 
-function setTagColor(i, ci) {
-  tags[i].color = ci;
-  const n = tags[i].name;
-  if (n) {
-    knownTags[n] = { name: n, color: ci };
-    persistTags();
-    // 모든 기존 로그의 같은 이름 태그 색상도 업데이트
-    Object.values(logs).forEach(e => {
-      (e.tags || []).forEach(t => { if (tagName(t) === n) t.color = ci; });
-    });
-    persist();
-  }
-  drawTags();
+function rmItemTag(sec, i, kind) {
+  delete items[sec][i][tagField(kind)];
+  persist();
+  drawList(sec);
   closeTagPop();
 }
 
+function setItemTagColor(sec, i, kind, ci) {
+  const item = items[sec][i];
+  const f = tagField(kind);
+  if (!item[f]) return;
+  item[f].color = ci;
+  const n = item[f].name;
+  if (n) {
+    knownTags[n] = { ...knownTags[n], name: n, color: ci };
+    persistTags();
+    Object.values(logs).forEach(e => {
+      (e.tItems || []).forEach(it => {
+        if (it.projectTag?.name === n) it.projectTag.color = ci;
+        if (it.typeTag?.name === n) it.typeTag.color = ci;
+      });
+    });
+    persist();
+  }
+  drawList(sec);
+  closeTagPop();
+}
+
+function onTagKey(e) {
+  if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); addTag(); return; }
+  if (e.key === 'Escape') { closeSuggest(); return; }
+}
+
+// ─── Tag popover ──────────────────────────────────────────────────────────────
 function closeTagPop() {
   document.getElementById('tag-pop').classList.remove('on');
-  popIdx = -1;
 }
 
 document.addEventListener('click', e => {
@@ -2243,12 +2015,8 @@ function loadEntry() {
   const e = logs[key(curDate)];
   items.y = e?.yItems ? e.yItems.map(i => typeof i === 'string' ? {text:i,done:false,level:0} : {...i,level:i.level??0}) : [];
   items.t = e?.tItems ? e.tItems.map(i => typeof i === 'string' ? {text:i,done:false,level:0} : {...i,level:i.level??0}) : [];
-  inputLevel.y = 0; inputLevel.t = 0;
-  updateAddRow('y'); updateAddRow('t');
-  drawList('y');
   drawList('t');
   tags = e ? [...(e.tags || [])] : [];
-  drawTags();
   document.getElementById('m-comm').value = e?.memo?.comm || '';
   document.getElementById('m-dec').value  = e?.memo?.dec  || '';
   document.getElementById('m-next').value = e?.memo?.next || '';
@@ -2296,6 +2064,7 @@ function deleteLog(dateStr) {
   delete logs[dateStr];
   persist();
   drawHistory();
+  if (curTab === 'perf') drawPerfReport();
   toast('삭제되었습니다');
 }
 
@@ -2317,7 +2086,7 @@ function renderFilterTagChips() {
   const filtered = current ? tags.filter(t => t.name.toLowerCase().includes(current)) : tags;
   if (!filtered.length) { container.classList.remove('on'); return; }
   container.innerHTML = filtered.map(t => {
-    const c = TAG_PALETTE[t.color ?? 0];
+    const c = palette(t);
     const sel = current === t.name.toLowerCase() ? ' selected' : '';
     return `<span class="filter-tag-chip${sel}" style="background:${c.bg};color:${c.text}"
       onmousedown="event.preventDefault();pickFilterTag('${x(t.name)}')">${x(t.name)}</span>`;
@@ -2345,7 +2114,14 @@ function drawHistory() {
   const fTag = document.getElementById('f-tag').value.trim().toLowerCase();
   let entries = Object.values(logs).sort((a,b) => b.date.localeCompare(a.date));
 
-  if (fTag) entries = entries.filter(e => (e.tags||[]).some(t => tagName(t).toLowerCase().includes(fTag)));
+  if (fTag) entries = entries.filter(e => {
+    const dayMatch = (e.tags||[]).some(t => tagName(t).toLowerCase().includes(fTag));
+    const itemMatch = (e.tItems||[]).some(it =>
+      it.projectTag?.name.toLowerCase().includes(fTag) ||
+      it.typeTag?.name.toLowerCase().includes(fTag)
+    );
+    return dayMatch || itemMatch;
+  });
 
   const el = document.getElementById('h-list');
   if (!entries.length) {
@@ -2393,14 +2169,23 @@ function drawHistory() {
     }
     const d = new Date(e.date + 'T00:00:00');
     const tArr = (e.tItems||e.t||[]).filter(i => (i.level ?? 0) === 0);
-    const preview = tArr.slice(0,3).map(itemText).filter(Boolean).join(' · ');
-    const etags = e.tags||[];
+    const previewItems = tArr.slice(0,3);
+    const previewHtml = previewItems.length
+      ? previewItems.map(it => {
+          const t = itemText(it);
+          if (!t) return '';
+          const chips = [it.projectTag, it.typeTag].filter(Boolean).map(tg => {
+            const c = palette(tg);
+            return `<span style="flex-shrink:0;background:${c.bg};color:${c.text};font-size:10px;padding:1px 7px;border-radius:20px;white-space:nowrap">${x(tg.name)}</span>`;
+          }).join('');
+          return `<div class="h-preview-row"><span class="h-preview-text">${x(t)}</span>${chips}</div>`;
+        }).filter(Boolean).join('')
+      : '';
     parts.push(`<div class="h-entry" onclick="openModal('${e.date}')">
       <div class="h-top">
         <div class="h-date">${x(koDate(d))}<span class="h-day">${x(koDow(d))}</span></div>
-        <div class="h-chips">${etags.map(t => { const c=TAG_PALETTE[t.color??0]; return `<div class="h-chip" style="background:${c.bg};color:${c.text}">${x(tagName(t))}</div>`; }).join('')}</div>
       </div>
-      <div class="h-preview">${preview ? x(preview) : '<em style="opacity:.5">내용 없음</em>'}</div>
+      <div class="h-preview">${previewHtml || '<em style="opacity:.5">내용 없음</em>'}</div>
       <div class="h-meta">
         ${(() => { const c=e.memo?.comm?.trim(),d=e.memo?.dec?.trim(),n=e.memo?.next?.trim();
           if (!c&&!d&&!n) return '<div class="h-stat" style="opacity:.3">☁️</div><div class="h-stat" style="opacity:.3">🐶</div><div class="h-stat" style="opacity:.3">🌿</div>';
@@ -2449,7 +2234,7 @@ function openModal(dateStr) {
 
   if (e.tags.length) html += `<div class="m-section">
     <div class="m-label">프로젝트 태그</div>
-    <div class="m-chips">${e.tags.map(t => { const c=TAG_PALETTE[t.color??0]; return `<div class="chip" style="background:${c.bg};color:${c.text}">${x(tagName(t))}</div>`; }).join('')}</div>
+    <div class="m-chips">${e.tags.map(t => { const c=palette(t); return `<div class="chip" style="background:${c.bg};color:${c.text}">${x(tagName(t))}</div>`; }).join('')}</div>
   </div>`;
 
   const memos = [
@@ -2489,7 +2274,10 @@ function drawPerfReport() {
 
   const prefix  = `${perfYear}-${String(perfMonth).padStart(2,'0')}`;
   const entries = Object.values(logs)
-    .filter(e => e.date.startsWith(prefix))
+    .filter(e => e.date.startsWith(prefix) && (
+      (e.tItems||e.t||[]).length ||
+      e.memo?.comm?.trim() || e.memo?.dec?.trim() || e.memo?.next?.trim()
+    ))
     .sort((a,b) => a.date.localeCompare(b.date));
 
   const summaryEl = document.getElementById('perf-summary');
@@ -2499,10 +2287,12 @@ function drawPerfReport() {
     return;
   }
 
-  // 태그 빈도 집계
+  // 태그 빈도 집계 (업무 단위 태그 우선, 없으면 날짜 태그 fallback)
   const tagCount = new Map();
   entries.forEach(e => {
-    (e.tags||[]).forEach(t => {
+    const itemTags = (e.tItems||[]).flatMap(it => [it.projectTag, it.typeTag].filter(Boolean));
+    const source = itemTags.length ? itemTags : (e.tags||[]);
+    source.forEach(t => {
       const n = tagName(t);
       tagCount.set(n, (tagCount.get(n) || 0) + 1);
     });
@@ -2511,8 +2301,7 @@ function drawPerfReport() {
 
   const tagChips = sortedTags.length
     ? sortedTags.map(([n, cnt]) => {
-        const colorIdx = knownTags[n]?.color ?? 0;
-        const c = TAG_PALETTE[colorIdx];
+        const c = palette(knownTags[n]);
         return `<span class="perf-doc-tag" style="background:${c.bg};color:${c.text};border-color:transparent">${x(n)} <span style="opacity:.55;font-weight:400">${cnt}</span></span>`;
       }).join('')
     : `<span class="perf-doc-empty-item">태그 없음</span>`;
@@ -2546,7 +2335,10 @@ function generatePerfPrompt() {
   const lines = entries.map(e => {
     const tItems = e.tItems || (e.t||[]).map(t => ({text:t,done:false,level:0}));
     const tags   = (e.tags||[]).map(t => tagName(t)).join(', ');
-    const items  = tItems.map(i => `  - [${i.done?'완료':'미완료'}] ${itemText(i)}`).join('\n');
+    const items  = tItems.map(i => {
+      const parts = [i.projectTag?.name, i.typeTag?.name].filter(Boolean);
+      return `  - ${itemText(i)}${parts.length ? ` [${parts.join(', ')}]` : ''}`;
+    }).join('\n');
     const comm   = e.memo?.comm?.trim();
     const diary  = e.memo?.dec?.trim();
     const lunch  = e.memo?.next?.trim();

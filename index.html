@@ -1304,8 +1304,8 @@
     <!-- Today checklist -->
     <div class="cl-block t">
       <div class="cl-table-head">
-        <div class="cl-th">업무</div>
         <div class="cl-th">프로젝트</div>
+        <div class="cl-th">업무</div>
         <div class="cl-th">유형</div>
         <div class="cl-th"></div>
       </div>
@@ -1449,6 +1449,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const DOC = db.collection('worklog').doc('data');
+const SESSION_ID = Math.random().toString(36).slice(2);
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let curDate = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })();
@@ -1512,6 +1513,7 @@ async function load() {
   DOC.onSnapshot(snap => {
     if (!snap.exists) return;
     const data = snap.data();
+    if (data._sid === SESSION_ID) return; // 내가 쓴 데이터 — 무시
     if (data.logs) { logs = data.logs; localStorage.setItem('wl_v1', JSON.stringify(logs)); }
     if (data.knownTags) { knownTags = data.knownTags; localStorage.setItem('wl_tags', JSON.stringify(knownTags)); }
     drawHistory();
@@ -1521,12 +1523,12 @@ async function load() {
 
 function persist() {
   try { localStorage.setItem('wl_v1', JSON.stringify(logs)); } catch(e) {}
-  DOC.set({ logs, knownTags }).catch(e => console.warn('Firestore 저장 실패:', e));
+  DOC.set({ logs, knownTags, _sid: SESSION_ID }).catch(e => console.warn('Firestore 저장 실패:', e));
 }
 
 function persistTags() {
   try { localStorage.setItem('wl_tags', JSON.stringify(knownTags)); } catch(e) {}
-  DOC.update({ knownTags }).catch(e => console.warn('Firestore 저장 실패:', e));
+  DOC.set({ logs, knownTags, _sid: SESSION_ID }).catch(e => console.warn('Firestore 저장 실패:', e));
 }
 
 // ─── Date helpers ─────────────────────────────────────────────────────────────
@@ -1683,8 +1685,8 @@ function drawList(sec) {
   el.innerHTML = items[sec].map((item, i) =>
     `<div class="cl-item" id="item-${sec}-${i}">
       <div class="cl-td"><span class="cl-text" onclick="editItem('${sec}',${i},this)">${x(item.text)}</span></div>
-      <div class="cl-td-tag">${tagSlot(sec, i, item, 'project')}</div>
       <div class="cl-td-tag">${tagSlot(sec, i, item, 'type')}</div>
+      <div class="cl-td-tag">${tagSlot(sec, i, item, 'project')}</div>
       <div class="cl-td-del"><button class="cl-del" onclick="delItem('${sec}',${i})">×</button></div>
     </div>`
   ).join('');

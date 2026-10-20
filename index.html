@@ -439,7 +439,7 @@
     /* ── Table layout ── */
     .cl-table-head {
       display: grid;
-      grid-template-columns: 1fr 90px 90px 28px;
+      grid-template-columns: 90px 1fr 90px 28px;
       border-bottom: 1px solid var(--border);
     }
     .cl-th {
@@ -453,7 +453,7 @@
 
     .cl-item {
       display: grid;
-      grid-template-columns: 1fr 90px 90px 28px;
+      grid-template-columns: 90px 1fr 90px 28px;
       align-items: stretch;
       border-bottom: 1px solid var(--border);
       transition: background .1s;
@@ -606,7 +606,7 @@
 
     .cl-add-row {
       display: grid;
-      grid-template-columns: 1fr 90px 90px 28px;
+      grid-template-columns: 90px 1fr 90px 28px;
       align-items: center;
       border-top: 1px solid var(--border);
     }
@@ -1304,15 +1304,16 @@
     <!-- Today checklist -->
     <div class="cl-block t">
       <div class="cl-table-head">
-        <div class="cl-th">프로젝트</div>
+        <div class="cl-th" style="text-align:center">프로젝트</div>
         <div class="cl-th">업무</div>
-        <div class="cl-th">유형</div>
+        <div class="cl-th" style="text-align:center">유형</div>
         <div class="cl-th"></div>
       </div>
       <div class="cl-list" id="list-t"></div>
       <div class="cl-add-row" id="add-row-t">
+        <div></div>
         <input class="cl-input" id="in-t" placeholder="항목 추가 후 Enter" onkeydown="onItemKey(event,'t')">
-        <div></div><div></div><div></div>
+        <div></div><div></div>
       </div>
     </div>
 
@@ -1684,9 +1685,9 @@ function drawList(sec) {
   if (!el) return;
   el.innerHTML = items[sec].map((item, i) =>
     `<div class="cl-item" id="item-${sec}-${i}">
+      <div class="cl-td-tag">${tagSlot(sec, i, item, 'project')}</div>
       <div class="cl-td"><span class="cl-text" onclick="editItem('${sec}',${i},this)">${x(item.text)}</span></div>
       <div class="cl-td-tag">${tagSlot(sec, i, item, 'type')}</div>
-      <div class="cl-td-tag">${tagSlot(sec, i, item, 'project')}</div>
       <div class="cl-td-del"><button class="cl-del" onclick="delItem('${sec}',${i})">×</button></div>
     </div>`
   ).join('');
